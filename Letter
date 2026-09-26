@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fortuna de las flores <3</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            color: #eee4ff;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(151, 91, 202, .22), transparent 28%),
+                radial-gradient(circle at 85% 75%, rgba(115, 64, 165, .2), transparent 30%),
+                linear-gradient(145deg, #0b0712 0%, #160b24 45%, #2b1240 100%);
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            opacity: .65;
+            background-image:
+                radial-gradient(circle, #ffffff 1px, transparent 1.5px),
+                radial-gradient(circle, #cba8ff 1px, transparent 1.5px),
+                radial-gradient(circle, #ffffff 1px, transparent 1.5px);
+            background-size: 90px 90px, 130px 130px, 190px 190px;
+            background-position: 10px 20px, 40px 70px, 80px 10px;
+        }
+
+        body::after {
+            background:
+                radial-gradient(circle at 50% 0%, rgba(192, 138, 255, .12), transparent 35%);
+        }
+
+        .screen {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* =========================
+           PANTALLA DE CONTRASEÑA
+        ========================= */
+
+        #passcodeScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .lock-container {
+            width: min(430px, 100%);
+            padding: 45px 30px;
+            text-align: center;
+            border: 1px solid rgba(202, 165, 255, .3);
+            border-radius: 28px;
+            background: rgba(19, 10, 30, .88);
+            backdrop-filter: blur(15px);
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, .5),
+                0 0 50px rgba(137, 78, 184, .12);
+        }
+
+        .moon {
+            font-size: 55px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px rgba(205, 169, 255, .6));
+        }
+
+        .lock-container h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 43px;
+            font-weight: 600;
+            color: #f0ddff;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #bca9d0;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        #codeDisplay {
+            letter-spacing: 12px;
+            font-size: 25px;
+            min-height: 38px;
+            margin-bottom: 22px;
+            color: #dfc5ff;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 290px;
+            margin: auto;
+        }
+
+        .key {
+            height: 58px;
+            border: 1px solid #55366e;
+            border-radius: 14px;
+            background: #1d102a;
+            color: #eee1ff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .key:hover {
+            background: #35204a;
+            border-color: #9c6fc3;
+            transform: translateY(-2px);
+        }
+
+        .key:active {
+            transform: scale(.95);
+        }
+
+        .key.clear {
+            color: #c49ae7;
+        }
+
+        .key.enter {
+            color: #ead8ff;
+            background: #4a2862;
+        }
+
+        .error {
+            height: 20px;
+            margin-top: 15px;
+            color: #df9fce;
+            font-size: 12px;
+        }
+
+        /* =========================
+           DASHBOARD
+        ========================= */
+
+        #dashboard {
+            padding: 35px 20px 50px;
+        }
+
+        .dashboard-inner {
+            width: min(900px, 100%);
+            margin: auto;
+        }
+
+        .top-decoration {
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 8px;
+            color: #9c78ba;
+            margin-bottom: 22px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(45px, 8vw, 75px);
+            font-weight: 500;
+            color: #f1ddff;
+            line-height: .95;
+            text-shadow: 0 0 30px rgba(196, 142, 255, .22);
+        }
+
+        .dashboard-header p {
+            margin-top: 18px;
+            color: #bba6d0;
+            font-size: 14px;
+        }
+
+        .dashboard-header .date {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #76558e;
+            letter-spacing: 2px;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .menu-card {
+            min-height: 210px;
+            padding: 30px 20px;
+            border: 1px solid #4d3262;
+            border-radius: 24px;
+            background: rgba(26, 14, 39, .82);
+            backdrop-filter: blur(12px);
+            cursor: pointer;
+            text-align: center;
+            transition: .3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+            border-color: #9268b9;
+            background: rgba(42, 23, 59, .9);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .25);
+        }
+
+        .menu-icon {
+            font-size: 42px;
+            margin-bottom: 18px;
+        }
+
+        .menu-card h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: #e8d2fa;
+            margin-bottom: 9px;
+        }
+
+        .menu-card p {
+            font-size: 11px;
+            color: #9f8bae;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           PÁGINAS INTERNAS
+        ========================= */
+
+        .page {
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .page-inner {
+            width: min(800px, 100%);
+            margin: auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 15px;
+            margin-bottom: 35px;
+            border: 1px solid #4e3561;
+            border-radius: 50px;
+            background: rgba(25, 13, 37, .7);
+            color: #bfa8d2;
+            font-size: 12px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .back-button:hover {
+            border-color: #9c6fc3;
+            color: #e4cefa;
+        }
+
+        .page-title {
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(42px, 8vw, 62px);
+            font-weight: 500;
+            color: #efd9ff;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #9e8bad;
+            font-size: 12px;
+            margin-bottom: 35px;
+        }
+
+        /* =========================
+           CARTA
+        ========================= */
+
+        .letter {
+            position: relative;
+            padding: clamp(28px, 6vw, 55px);
+            border: 1px solid #5a3a70;
+            border-radius: 4px;
+            background:
+                linear-gradient(135deg, rgba(40, 22, 55, .95), rgba(25, 13, 37, .96));
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, .3),
+                inset 0 0 60px rgba(142, 92, 180, .04);
+        }
+
+        .letter::before {
+            content: "🌙";
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 22px;
+            opacity: .55;
+        }
+
+        .letter-flower {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 25px;
+        }
+
+        .letter p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 21px;
+            line-height: 1.65;
+            color: #e4d8eb;
+            margin-bottom: 22px;
+        }
+
+        .letter .quote {
+            text-align: center;
+            font-size: 25px;
+            font-style: italic;
+            color: #cda8e8;
+            margin: 25px 0;
+        }
+
+        .letter .center {
+            text-align: center;
+        }
+
+        .letter .love {
+            font-size: 30px;
+            color: #e7c7ff;
+            margin: 30px 0;
+        }
+
+        .signature {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #49315a;
+            text-align: right;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
+            font-style: italic;
+            color: #c7aed6;
+        }
+
+        /* =========================
+           MÚSICA
+        ========================= */
+
+        .music-card {
+            padding: 25px;
+            border: 1px solid #55386a;
+            border-radius: 25px;
+            background: rgba(27, 14, 40, .85);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+        }
+
+        .album-art {
+            width: 170px;
+            height: 170px;
+            margin: 5px auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            background:
+                radial-gradient(circle, #21112f 0 22%, #59306f 23% 25%, #170c21 26% 100%);
+            box-shadow:
+                0 0 0 8px rgba(121, 72, 153, .12),
+                0 0 45px rgba(151, 93, 196, .25);
+            animation: rotate 12s linear infinite;
+            animation-play-state: paused;
+        }
+
+        .album-art.playing {
+            animation-play-state: running;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .song-title {
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            color: #ead4fa;
+        }
+
+        .artist {
+            text-align: center;
+            color: #987ca9;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .music-message {
+            max-width: 600px;
+            margin: 25px auto;
+            padding: 18px 20px;
+            border-left: 2px solid #7e569b;
+            color: #bba9c7;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 19px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .youtube-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border-radius: 18px;
+            margin-top: 25px;
+            border: 1px solid #49315a;
+            background: #08050c;
+        }
+
+        .youtube-container iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* =========================
+           NUESTRO UNIVERSO
+        ========================= */
+
+        .universe-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 17px;
+        }
+
+        .memory-card {
+            padding: 25px;
+            min-height: 170px;
+            border: 1px solid #4c3260;
+            border-radius: 22px;
+            background: rgba(26, 14, 39, .82);
+            transition: .3s ease;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-4px);
+            border-color: #8761a6;
+        }
+
+        .memory-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .memory-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 25px;
+            color: #dfc8ed;
+            margin-bottom: 9px;
+        }
+
+        .memory-card p {
+            font-size: 12px;
+            line-height: 1.7;
+            color: #9e8eaa;
+        }
+
+        /* =========================
+           FORTUNA DE LAS FLORES
+        ========================= */
+
+        .fortune {
+            margin-top: 30px;
+            padding: 35px 25px;
+            text-align: center;
+            border: 1px solid #523667;
+            border-radius: 25px;
+            background: rgba(31, 16, 44, .85);
+        }
+
+        .flower {
+            font-size: 75px;
+            margin: 15px;
+            filter: drop-shadow(0 0 15px rgba(192, 133, 237, .25));
+            transition: .3s;
+        }
+
+        .petal-count {
+            color: #9f8bae;
+            font-size: 11px;
+            margin-bottom: 18px;
+        }
+
+        .fortune-result {
+            min-height: 45px;
+            margin-bottom: 18px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 25px;
+            color: #dfc3ef;
+        }
+
+        .fortune-button {
+            border: 1px solid #76508f;
+            border-radius: 50px;
+            padding: 12px 22px;
+            background: #321b45;
+            color: #e1c8ef;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            transition: .2s;
+        }
+
+        .fortune-button:hover {
+            background: #48265e;
+            transform: translateY(-2px);
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+            margin-top: 45px;
+            color: #654d75;
+            font-size: 11px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-card {
+                min-height: 150px;
+                padding: 24px 20px;
+            }
+
+            .menu-icon {
+                font-size: 34px;
+                margin-bottom: 10px;
+            }
+
+            .universe-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .letter p {
+                font-size: 19px;
+            }
+
+            .letter .quote {
+                font-size: 22px;
+            }
+
+            .page {
+                padding: 22px 15px 45px;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .lock-container {
+                padding: 35px 20px;
+            }
+
+            .lock-container h1 {
+                font-size: 36px;
+            }
+
+            .key {
+                height: 53px;
+            }
+
+            .letter {
+                padding: 27px 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================================
+         PANTALLA DE CONTRASEÑA
+    ====================================================== -->
+
+    <section id="passcodeScreen" class="screen">
+
+        <div class="lock-container">
+
+            <div class="moon">🌙</div>
+
+            <h1>Hay algo para ti</h1>
+
+            <p class="subtitle">
+                Una pequeña parte de todo lo que siento por ti.<br>
+                Pero primero tendrás que encontrar la forma de entrar.
+            </p>
+
+            <div id="codeDisplay">♡ ♡ ♡ ♡</div>
+
+            <div class="keypad">
+
+                <button class="key" onclick="pressKey('1')">1</button>
+                <button class="key" onclick="pressKey('2')">2</button>
+                <button class="key" onclick="pressKey('3')">3</button>
+
+                <button class="key" onclick="pressKey('4')">4</button>
+                <button class="key" onclick="pressKey('5')">5</button>
+                <button class="key" onclick="pressKey('6')">6</button>
+
+                <button class="key" onclick="pressKey('7')">7</button>
+                <button class="key" onclick="pressKey('8')">8</button>
+                <button class="key" onclick="pressKey('9')">9</button>
+
+                <button class="key clear" onclick="clearCode()">←</button>
+                <button class="key" onclick="pressKey('0')">0</button>
+                <button class="key enter" onclick="checkCode()">♡</button>
+
+            </div>
+
+            <div id="errorMessage" class="error"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+
+    <section id="dashboard" class="screen hidden">
+
+        <div class="dashboard-inner">
+
+            <div class="top-decoration">
+                ✦　✧　✦　✧　✦
+            </div>
+
+            <header class="dashboard-header">
+
+                <h1>Fortuna de las flores &lt;3</h1>
+
+                <p>
+                    Una pequeña colección de cosas que quería dejarte.
+                </p>
+
+                <div class="date">
+                    PARA TI · CON CARIÑO
+                </div>
+
+            </header>
+
+
+            <div class="menu">
+
+                <div class="menu-card" onclick="showPage('letterPage')">
+
+                    <div class="menu-icon">💌</div>
+
+                    <h2>Una carta para ti</h2>
+
+                    <p>
+                        Algunas cosas que quería decirte
+                        y que quizá no sé decir en voz alta.
+                    </p>
+
+                </div>
+
+
+                <div class="menu-card" onclick="showPage('musicPage')">
+
+                    <div class="menu-icon">🎧</div>
+
+                    <h2>Nuestra canción</h2>
+
+                    <p>
+                        Una canción que recordé porque
+                        una vez me dijiste que te gustaba mucho.
+                    </p>
+
+                </div>
+
+
+                <div class="menu-card" onclick="showPage('universePage')">
+
+                    <div class="menu-icon">🌙</div>
+
+                    <h2>Nuestro pequeño universo</h2>
+
+                    <p>
+                        Pequeñas cosas que hacen que
+                        este rincón sea nuestro.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer">
+                Hecho con un poquito de amor, estrellas y demasiados pétalos.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CARTA
+    ====================================================== -->
+
+    <section id="letterPage" class="screen page hidden">
+
+        <div class="page-inner">
+
+            <button class="back-button" onclick="goHome()">
+                ← Volver
+            </button>
+
+            <h1 class="page-title">Para ti</h1>
+
+            <p class="page-subtitle">
+                entre flores, pétalos y un poquito de Luna
+            </p>
+
+
+            <article class="letter">
+
+                <div class="letter-flower">
+                    🌸
+                </div>
+
+
+                <p>
+                    Tal vez volvería a jugar a la fortuna de las flores.
+                    ¿La conoces? Eso de quitar un pétalo tras otro,
+                    intentando descifrar lo que el corazón no se atreve a preguntar.
+                </p>
+
+
+                <p class="quote">
+                    “Me quiere, no me quiere...”
+                </p>
+
+
+                <p>
+                    Quizás por eso me gusta tanto la idea de las flores.
+                    Porque durante mucho tiempo pareciera que amar también era eso:
+                    arrancar pétalos, buscar señales y esperar que la última palabra
+                    fuera la que uno quería escuchar.
+                </p>
+
+
+                <p>
+                    Pero contigo no quiero jugar a adivinar.
+                </p>
+
+
+                <p>
+                    Si volviera a hacerlo, creo que elegiría la misma flor
+                    una y otra vez. No para preguntarle a la fortuna si me quieres,
+                    sino porque, de alguna manera, siento que ya encontré aquello
+                    que estaba buscando.
+                </p>
+
+
+                <p>
+                    Y quizás por eso terminé escribiendo esto para ti:
+                </p>
+
+
+                <p class="center">
+                    Tal vez intentaré jugar a la fortuna de las flores.<br>
+                    Si es fortuna para ti, entonces siempre.
+                </p>
+
+
+                <p class="center">
+                    Quiero que me digas que la Luna es hermosa<br>
+                    y también quiero ser aquel que siempre puedas ver.
+                </p>
+
+
+                <p class="center">
+                    Soñando con destinos románticos,<br>
+                    ¿eres tú quien está detrás de ellos?
+                </p>
+
+
+                <p class="center">
+                    Si el amor no se dice, es como si no existiera.<br>
+                    Entonces déjame decirlo una vez más:
+                </p>
+
+
+                <p class="love center">
+                    Te amo.
+                </p>
+
+
+                <p class="center">
+                    Como una sola flor que florece iluminada por la Luna,
+                    así quiero quedarme.
+                </p>
+
+
+                <div class="signature">
+                    Me voy a dormir, cualquier cosa te amo mucho, cariño.<br>
+                    Feliz San Valentín. &lt;3
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MÚSICA
+    ====================================================== -->
+
+    <section id="musicPage" class="screen page hidden">
+
+        <div class="page-inner">
+
+            <button class="back-button" onclick="goHome()">
+                ← Volver
+            </button>
+
+            <h1 class="page-title">Para escuchar juntos</h1>
+
+            <p class="page-subtitle">
+                aunque estemos en lugares diferentes
+            </p>
+
+
+            <div class="music-card">
+
+                <div id="albumArt" class="album-art">
+                    🌙
+                </div>
+
+
+                <h2 class="song-title">
+                    Slow Dancing in the Dark
+                </h2>
+
+                <p class="artist">
+                    Joji
+                </p>
+
+
+                <div class="music-message">
+
+                    “Una vez me dijiste que te gustaba mucho esta canción.
+                    Mientras hacía este detalle, la recordé y pensé en ti,
+                    así que sentí que también debía formar parte de este
+                    pequeño universo. 🌙”
+
+                </div>
+
+
+                <div class="youtube-container">
+
+                    <iframe
+                        src="https://www.youtube.com/embed/K3Qzzggn--s"
+                        title="Joji - Slow Dancing in the Dark"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer">
+                Dale play cuando quieras. Esta parte es especialmente para ti.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         NUESTRO UNIVERSO
+    ====================================================== -->
+
+    <section id="universePage" class="screen page hidden">
+
+        <div class="page-inner">
+
+            <button class="back-button" onclick="goHome()">
+                ← Volver
+            </button>
+
+            <h1 class="page-title">
+                Nuestro pequeño universo
+            </h1>
+
+            <p class="page-subtitle">
+                no necesitamos fotos para guardar recuerdos
+            </p>
+
+
+            <div class="universe-grid">
+
+                <div class="memory-card">
+
+                    <div class="memory-icon">🌙</div>
+
+                    <h3>Tú, yo y la distancia</h3>
+
+                    <p>
+                        Hay kilómetros entre nosotros, pero eso no ha impedido
+                        que encontremos maneras de sentirnos cerca.
+                    </p>
+
+                </div>
+
+
+                <div class="memory-card">
+
+                    <div class="memory-icon">🎧</div>
+
+                    <h3>Canciones que te recuerdan</h3>
+
+                    <p>
+                        A veces basta con escuchar una canción que me dijiste
+                        que te gustaba para que automáticamente piense en ti.
+                    </p>
+
+                </div>
+
+
+                <div class="memory-card">
+
+                    <div class="memory-icon">💌</div>
+
+                    <h3>Las palabras</h3>
+
+                    <p>
+                        Algunas cosas se quedan porque fueron dichas,
+                        y otras porque alguien decidió escribirlas.
+                    </p>
+
+                </div>
+
+
+                <div class="memory-card">
+
+                    <div class="memory-icon">🌸</div>
+
+                    <h3>La misma flor</h3>
+
+                    <p>
+                        Si tuviera que elegir una flor una y otra vez,
+                        creo que ya sabes cuál sería la respuesta.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORTUNA DE LAS FLORES -->
+
+            <div class="fortune">
+
+                <div class="flower" id="flower">
+                    🌸
+                </div>
+
+                <p class="petal-count" id="petalCount">
+                    Una pequeña fortuna...
+                </p>
+
+                <div class="fortune-result" id="fortuneResult">
+                    ¿Quieres preguntarle algo a la flor?
+                </div>
+
+                <button class="fortune-button" onclick="pickPetal()">
+                    Quitar un pétalo
+                </button>
+
+            </div>
+
+
+            <div class="footer">
+                Y si la flor termina diciendo lo que ya sé... mejor no preguntarle.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        /* =========================
+           CONTRASEÑA
+        ========================= */
+
+        const CORRECT_CODE = "0515";
+
+        let enteredCode = "";
+
+        const codeDisplay =
+            document.getElementById("codeDisplay");
+
+        const errorMessage =
+            document.getElementById("errorMessage");
+
+
+        function pressKey(number) {
+
+            if (enteredCode.length >= 4) {
+                return;
+            }
+
+            enteredCode += number;
+
+            updateCodeDisplay();
+
+            errorMessage.textContent = "";
+
+        }
+
+
+        function clearCode() {
+
+            enteredCode = "";
+
+            updateCodeDisplay();
+
+            errorMessage.textContent = "";
+
+        }
+
+
+        function updateCodeDisplay() {
+
+            if (enteredCode.length === 0) {
+
+                codeDisplay.textContent =
+                    "♡ ♡ ♡ ♡";
+
+                return;
+
+            }
+
+            let display = "";
+
+            for (let i = 0; i < 4; i++) {
+
+                if (i < enteredCode.length) {
+
+                    display += "● ";
+
+                } else {
+
+                    display += "♡ ";
+
+                }
+
+            }
+
+            codeDisplay.textContent =
+                display.trim();
+
+        }
+
+
+        function checkCode() {
+
+            if (enteredCode === CORRECT_CODE) {
+
+                document
+                    .getElementById("passcodeScreen")
+                    .classList.add("hidden");
+
+                document
+                    .getElementById("dashboard")
+                    .classList.remove("hidden");
+
+                enteredCode = "";
+
+            } else {
+
+                errorMessage.textContent =
+                    "Mmm... parece que esa no es la fortuna correcta. ♡";
+
+                enteredCode = "";
+
+                updateCodeDisplay();
+
+            }
+
+        }
+
+
+        /* =========================
+           NAVEGACIÓN
+        ========================= */
+
+        function showPage(pageId) {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(screen => {
+
+                    if (screen.id !== "passcodeScreen") {
+
+                        screen.classList.add("hidden");
+
+                    }
+
+                });
+
+            document
+                .getElementById(pageId)
+                .classList.remove("hidden");
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        function goHome() {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(screen => {
+
+                    if (screen.id !== "passcodeScreen") {
+
+                        screen.classList.add("hidden");
+
+                    }
+
+                });
+
+            document
+                .getElementById("dashboard")
+                .classList.remove("hidden");
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        /* =========================
+           FORTUNA DE LAS FLORES
+        ========================= */
+
+        const fortunes = [
+
+            "Me quiere.",
+
+            "Me quiere mucho.",
+
+            "Me quiere siempre.",
+
+            "Quizás la flor ya sabe la respuesta.",
+
+            "No hace falta preguntarle a la flor."
+
+        ];
+
+
+        let petalIndex = 0;
+
+
+        function pickPetal() {
+
+            const result =
+                document.getElementById("fortuneResult");
+
+            const count =
+                document.getElementById("petalCount");
+
+            const flower =
+                document.getElementById("flower");
+
+
+            if (petalIndex < fortunes.length) {
+
+                result.textContent =
+                    fortunes[petalIndex];
+
+                count.textContent =
+                    "Pétalo " +
+                    (petalIndex + 1) +
+                    " de " +
+                    fortunes.length;
+
+                petalIndex++;
+
+                flower.style.transform =
+                    "scale(.92) rotate(" +
+                    (petalIndex * 8) +
+                    "deg)";
+
+            } else {
+
+                result.textContent =
+                    "Ya no quedan pétalos. Pero creo que tampoco quedan dudas.";
+
+                count.textContent =
+                    "La fortuna ya habló.";
+
+                flower.textContent =
+                    "🌷";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
